@@ -233,15 +233,17 @@ Just tell me what workflow you'd like to build, and I'll guide you step-by-step!
       // Build workflow proposal if actions detected
       let workflowProposal: WorkflowStep[] | undefined;
       if (hasDetectedActions) {
-        workflowProposal = data.detected_actions.map((actionId: string, index: number) => {
+        workflowProposal = data.detected_actions.map((action: any, index: number) => {
+          // Handle both string (action_id) and object format
+          const actionId = typeof action === 'string' ? action : action.action_id;
           const actionDef = ACTION_CATALOG[actionId];
           return {
             stepNumber: index + 1,
-            title: actionDef?.name || actionId,
-            description: actionDef?.name || actionId,
+            title: actionDef?.name || action.name || actionId,
+            description: actionDef?.description || actionDef?.name || action.name || actionId,
             actionId,
             connector: actionDef?.connector,
-            icon: actionDef?.icon,
+            icon: action.icon || actionDef?.icon,
             status: 'pending' as const,
           };
         });
