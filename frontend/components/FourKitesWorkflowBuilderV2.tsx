@@ -19,27 +19,27 @@ import ReactMarkdown from 'react-markdown';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8001';
 
-// Quick prompt suggestions based on existing actions
+// Supply Chain Workflow Templates (Prebuilt Prompts)
 const QUICK_PROMPTS = [
   {
-    icon: '📧',
-    text: 'Send email notifications',
-    prompt: 'Send an email notification to facility managers',
+    icon: '🚛',
+    text: 'Late Delivery Notification',
+    prompt: 'Create a workflow that sends an email notification to the facility manager when a shipment is delayed, waits 48 hours for a response, and escalates to the supervisor if no response is received',
   },
   {
-    icon: '⏱️',
-    text: 'Wait and check response',
-    prompt: 'Wait 48 hours and check for email response',
+    icon: '📨',
+    text: 'Auto-Response Tracking',
+    prompt: 'Build a workflow that checks the email inbox every 4 hours for shipment updates, parses the email response with AI to extract delivery information, and sends a follow-up email if the information is incomplete',
   },
   {
-    icon: '🚨',
-    text: 'Escalate if no response',
-    prompt: 'Escalate to manager if no response after 2 days',
+    icon: '📄',
+    text: 'Document Processing & Email',
+    prompt: 'Create a workflow that extracts text from a PDF invoice, uses AI to parse and extract key shipment details, and sends an email with the extracted information to the operations team',
   },
   {
-    icon: '🤖',
-    text: 'Parse email with AI',
-    prompt: 'Parse email response and extract key information',
+    icon: '⚠️',
+    text: 'Escalation Workflow',
+    prompt: 'Build an escalation workflow that sends an initial email to the facility, waits 24 hours, sends a follow-up if no response, waits another 24 hours, and then escalates to management with high priority',
   },
 ];
 

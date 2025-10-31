@@ -25,9 +25,9 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Include API routers
-from app.api import workflow_agent_router
-app.include_router(workflow_agent_router, prefix="/api")
+# Include API routers - TODO: Add workflow agent router when implemented
+# from app.api import workflow_agent_router
+# app.include_router(workflow_agent_router, prefix="/api")
 
 # Health check endpoint
 @app.get("/health")
