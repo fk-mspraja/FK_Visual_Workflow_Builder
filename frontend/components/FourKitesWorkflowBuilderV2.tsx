@@ -546,7 +546,7 @@ Just tell me what workflow you'd like to build, and I'll guide you step-by-step!
                   onFocus={() => setShowQuickPrompts(false)}
                   placeholder="Describe your workflow..."
                   rows={2}
-                  className="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:border-blue-500 transition-colors"
+                  className="w-full px-4 py-3 pr-12 border-2 border-gray-200 rounded-xl text-sm resize-none focus:outline-none focus:border-blue-500 transition-colors text-gray-900 placeholder:text-gray-400"
                 />
               </div>
 
