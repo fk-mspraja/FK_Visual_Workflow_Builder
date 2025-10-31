@@ -1,32 +1,46 @@
-# FastAPI and ASGI server
+# Core Framework
 fastapi==0.104.1
 uvicorn==0.24.0
-python-multipart==0.0.6
-
-# Pydantic for data validation
 pydantic==2.10.5
 pydantic-settings==2.7.1
+python-multipart==0.0.6
+python-dotenv==1.0.0
 
-# CORS middleware
-python-jose[cryptography]==3.3.0
-
-# Redis for session storage
-redis==5.0.1
-
-# Rate limiting
-slowapi==0.1.9
-
-# LangChain and AI
-langchain==0.1.0
-langchain-anthropic==0.1.0
-langgraph==0.0.20
-
-# Document processing
-python-docx==1.1.0
-PyPDF2==3.0.1
+# AI/LangChain (Latest compatible versions)
+langchain>=0.3
+langchain-anthropic>=0.3
+langchain-core>=0.3
+langgraph>=0.2
+anthropic>=0.72
 
 # Temporal
 temporalio==1.4.0
 
+# Database & Caching
+redis==5.0.1
+SQLAlchemy==2.0.44
+
+# Document Processing
+python-docx==1.1.0
+PyPDF2==3.0.1
+lxml==6.0.2
+
+# Security & Auth
+python-jose==3.3.0
+cryptography>=46.0
+
+# HTTP & Networking
+httpx>=0.28
+aiohttp>=3.13
+requests>=2.32
+
+# Rate Limiting
+slowapi==0.1.9
+limits==5.6.0
+
+# Data Processing
+numpy==1.26.4
+
 # Utilities
-python-dotenv==1.0.0
+python-dateutil
+pytz
