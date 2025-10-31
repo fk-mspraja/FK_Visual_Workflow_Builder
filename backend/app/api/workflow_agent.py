@@ -1,15 +1,32 @@
 """
 Workflow Agent API Routes
-Handles conversational workflow building with AI
+Handles conversational workflow building with AI using LangGraph ReAct Agent
 """
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 import logging
+import json
+
+from app.agents.workflow_agent import create_workflow_builder_agent, process_user_message
+from app.core.session_store import InMemorySessionStore
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter()
+
+# Initialize agent and session store
+agent = None
+session_store = InMemorySessionStore()
+
+
+def get_agent():
+    """Lazily initialize the agent"""
+    global agent
+    if agent is None:
+        logger.info("Initializing LangGraph workflow builder agent...")
+        agent = create_workflow_builder_agent()
+    return agent
 
 
 class ChatRequest(BaseModel):
@@ -31,70 +48,83 @@ class ChatResponse(BaseModel):
 @router.post("/workflow-agent/chat")
 async def chat_with_agent(request: ChatRequest) -> ChatResponse:
     """
-    Chat endpoint for conversational workflow building
+    Chat endpoint for conversational workflow building with LangGraph ReAct agent
 
-    This endpoint receives user messages and returns AI-generated responses
-    with detected actions and workflow steps.
+    This endpoint uses a real AI agent that:
+    - Analyzes user requirements
+    - Maps them to available actions
+    - Asks clarifying questions
+    - Collects missing parameters
+    - Generates workflow JSON when complete
     """
     try:
-        logger.info(f"Received chat message: {request.message[:100]}...")
-
-        # For now, return a simple response
-        # TODO: Integrate with actual LangGraph agent
-
         session_id = request.session_id or f"session-{id(request)}"
+        logger.info(f"[{session_id}] Processing message: {request.message[:100]}...")
 
-        # Simple mock response for testing
-        response_text = (
-            f"I understand you want to: {request.message}\n\n"
-            "To help you build this workflow, I'll need some information:\n"
-            "1. What is the recipient email address?\n"
-            "2. Which facility should this workflow target?\n\n"
-            "Please provide these details so I can create the workflow for you."
+        # Get conversation history for this session
+        conversation_history = session_store.get_conversation(session_id)
+
+        # Get the agent
+        workflow_agent = get_agent()
+
+        # Process message with LangGraph agent
+        result = process_user_message(
+            agent=workflow_agent,
+            message=request.message,
+            conversation_history=conversation_history
         )
 
-        # Detect if user mentioned specific actions
+        # Extract response
+        agent_response = result.get("response", "I'm processing your request...")
+
+        # Parse detected actions from agent's tool calls
         detected_actions = []
-        user_message_lower = request.message.lower()
+        workflow_steps = None
 
-        if 'email' in user_message_lower or 'send' in user_message_lower:
-            detected_actions.append({
-                "action_id": "send_email_level1_real",
-                "name": "Send Initial Email",
-                "icon": "📧",
-                "confidence": 0.9
-            })
+        # Check if agent mapped actions
+        if "suggested_actions" in result:
+            for action_id in result.get("suggested_actions", []):
+                # Import ACTION_CATALOG from workflow_agent
+                from app.agents.workflow_agent import ACTION_CATALOG
+                if action_id in ACTION_CATALOG:
+                    action_def = ACTION_CATALOG[action_id]
+                    detected_actions.append({
+                        "action_id": action_id,
+                        "name": action_def["name"],
+                        "icon": action_def["icon"],
+                        "confidence": 0.9
+                    })
 
-        if 'wait' in user_message_lower or 'timer' in user_message_lower:
-            detected_actions.append({
-                "action_id": "wait_timer",
-                "name": "Wait Timer",
-                "icon": "⏱️",
-                "confidence": 0.85
-            })
+        # Check if workflow is complete
+        if result.get("workflow_json"):
+            try:
+                workflow_data = json.loads(result["workflow_json"]) if isinstance(result["workflow_json"], str) else result["workflow_json"]
+                # Convert nodes to workflow_steps format for frontend
+                workflow_steps = []
+                for i, node in enumerate(workflow_data.get("nodes", [])):
+                    workflow_steps.append({
+                        "stepNumber": i + 1,
+                        "actionId": node["data"]["activity"],
+                        "title": node["data"]["label"],
+                        "description": node["data"].get("label", ""),
+                        "icon": node["data"].get("icon", "📦"),
+                        "connector": "FourKites",
+                        "status": "pending",
+                        "params": node["data"].get("params", {})
+                    })
+            except Exception as e:
+                logger.error(f"Error parsing workflow JSON: {e}")
 
-        if 'escalate' in user_message_lower or 'escalation' in user_message_lower:
-            detected_actions.append({
-                "action_id": "send_email_level3_escalation_real",
-                "name": "Send Escalation Email",
-                "icon": "🚨",
-                "confidence": 0.95
-            })
-
-        if 'parse' in user_message_lower or 'extract' in user_message_lower:
-            detected_actions.append({
-                "action_id": "parse_email_response_real",
-                "name": "Parse Email Response (AI)",
-                "icon": "🤖📧",
-                "confidence": 0.88
-            })
+        # Update conversation history
+        updated_history = result.get("conversation_history", conversation_history)
+        session_store.save_conversation(session_id, updated_history)
 
         return ChatResponse(
             status="success",
             session_id=session_id,
-            agent_response=response_text,
+            agent_response=agent_response,
             detected_actions=detected_actions if detected_actions else None,
-            workflow_steps=None
+            workflow_steps=workflow_steps
         )
 
     except Exception as e:
