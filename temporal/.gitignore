@@ -1,0 +1,19 @@
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Temporal outputs
+workflow_outputs/
+
+# Logs
+*.log
+
+# OS files
+.DS_Store

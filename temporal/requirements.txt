@@ -1,0 +1,20 @@
+# Temporal
+temporalio==1.4.0
+
+# Activities dependencies
+requests==2.31.0
+google-auth==2.23.0
+google-auth-oauthlib==1.1.0
+google-auth-httplib2==0.1.1
+google-api-python-client==2.108.0
+
+# Document processing
+python-docx==1.1.0
+PyPDF2==3.0.1
+
+# AI for parsing
+langchain==0.1.0
+langchain-anthropic==0.1.0
+
+# Utilities
+python-dotenv==1.0.0
