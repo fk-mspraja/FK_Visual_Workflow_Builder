@@ -1,0 +1,156 @@
+# ==========================================
+# FourKites Workflow Builder - Git Ignore
+# ==========================================
+
+# ==========================================
+# ENVIRONMENT & SECRETS
+# ==========================================
+.env
+.env.local
+.env.*.local
+*.env
+config/gmail_credentials.json
+config/gmail_token.json
+*.pem
+*.key
+*.crt
+
+# ==========================================
+# PYTHON
+# ==========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+temporal/venv/
+temporal/bin/
+temporal/lib/
+temporal/include/
+temporal/pyvenv.cfg
+
+# PyCharm
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# ==========================================
+# NODE.JS / FRONTEND
+# ==========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Next.js
+.next/
+out/
+.vercel
+
+# Production builds
+build/
+dist/
+
+# Dependency directories
+jspm_packages/
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# ==========================================
+# TEMPORAL
+# ==========================================
+temporal-history/
+workflow_outputs/
+
+# ==========================================
+# LOGS
+# ==========================================
+*.log
+logs/
+*.log.*
+
+# ==========================================
+# OS FILES
+# ==========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# ==========================================
+# DOCKER
+# ==========================================
+docker-compose.override.yml
+
+# ==========================================
+# REDIS
+# ==========================================
+dump.rdb
+
+# ==========================================
+# TESTING
+# ==========================================
+coverage/
+.nyc_output
+
+# ==========================================
+# MISC
+# ==========================================
+.claude/
+*.bak
+*.backup
+*.old
+*.tmp
+.backup_*
