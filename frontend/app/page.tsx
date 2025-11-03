@@ -1,358 +1,222 @@
 'use client';
 
-import Link from 'next/link';
-import Image from 'next/image';
-import { useState } from 'react';
-import { WORKFLOW_TEMPLATES_ENTERPRISE } from '@/lib/enterpriseTemplates';
-import { ACTION_BLOCKS, getActionsByCategory } from '@/lib/actions';
-import { FourKitesWorkflowBuilderV2 } from '@/components/FourKitesWorkflowBuilderV2';
+import { signIn } from 'next-auth/react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+import { motion } from 'framer-motion';
 
-export default function Home() {
-  const [activeTab, setActiveTab] = useState<'templates' | 'actions'>('templates');
-  const [selectedCategory, setSelectedCategory] = useState('All');
-  const [showAIBuilder, setShowAIBuilder] = useState(false);
+function LoginContent() {
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error');
 
-  const categories = ['All', 'Logistics', 'Compliance', 'Operations'];
-  const actionsByCategory = getActionsByCategory();
-
-  const filteredTemplates = selectedCategory === 'All'
-    ? WORKFLOW_TEMPLATES_ENTERPRISE
-    : WORKFLOW_TEMPLATES_ENTERPRISE.filter(t => t.category === selectedCategory);
+  const handleGoogleSignIn = () => {
+    signIn('google', { callbackUrl: '/workflows' });
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Top Navigation */}
-      <nav className="border-b border-slate-200 bg-white sticky top-0 z-50 shadow-sm">
-        <div className="max-w-[1600px] mx-auto px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-3">
-                <Image
-                  src="/fourkites-logo.png"
-                  alt="FourKites"
-                  width={140}
-                  height={32}
-                  className="h-8 w-auto"
-                />
-                <div className="h-8 w-px bg-slate-300"></div>
-                <div>
-                  <h1 className="text-sm font-bold text-slate-900">Workflow Orchestrator</h1>
-                  <p className="text-xs text-slate-500">Enterprise Automation Platform</p>
-                </div>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link
-                href="/history"
-                className="px-4 py-2 text-sm font-medium text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                History
-              </Link>
-              <Link
-                href="/builder?guide=true"
-                className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm rounded-lg transition-all flex items-center gap-2 shadow-sm"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Custom Workflow
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="min-h-screen flex">
+      {/* Left Side - Login Form */}
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full lg:w-1/2 flex items-center justify-center bg-white px-8"
+      >
+        <div className="w-full max-w-md">
+          {/* FourKites Logo */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="mb-8"
+          >
+            <img src="/fk_logo.png" alt="FourKites" className="h-12" />
+          </motion.div>
 
-      {/* Hero Section */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-[1600px] mx-auto px-8 py-16">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 border border-blue-200 rounded-md text-blue-700 text-sm font-medium mb-6">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              Production-Ready Automation
-            </div>
-            <h1 className="text-4xl font-bold text-slate-900 mb-4 tracking-tight">
-              Enterprise Workflow Platform
-            </h1>
-            <p className="text-lg text-slate-600 leading-relaxed mb-8">
-              Pre-built workflow templates and drag-and-drop automation for logistics operations.
-              Deploy scalable workflows powered by Temporal orchestration.
-            </p>
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="text-3xl font-bold text-gray-900 mb-2"
+          >
+            Welcome to FourKites Agentic Workflow Builder
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="text-gray-600 mb-8"
+          >
+            Sign in to get started
+          </motion.p>
 
-            {/* CTA Buttons */}
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setShowAIBuilder(true)}
-                className="group px-6 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all flex items-center gap-3"
-              >
-                <div className="w-8 h-8 rounded-lg bg-white/20 flex items-center justify-center">
-                  🤖
-                </div>
-                <div className="text-left">
-                  <div className="text-sm font-bold">Create with AI</div>
-                  <div className="text-xs text-blue-100">From requirement documents</div>
-                </div>
-                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-              </button>
-
-              <Link
-                href="/builder?guide=true"
-                className="px-6 py-3.5 bg-white hover:bg-gray-50 text-slate-900 font-semibold rounded-xl border-2 border-slate-200 hover:border-slate-300 transition-all flex items-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z" />
-                </svg>
-                Build Manually
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs Navigation */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-[1600px] mx-auto px-8">
-          <div className="flex gap-1">
-            <button
-              onClick={() => setActiveTab('templates')}
-              className={`px-6 py-4 text-sm font-semibold border-b-2 transition-colors ${
-                activeTab === 'templates'
-                  ? 'border-slate-900 text-slate-900'
-                  : 'border-transparent text-slate-500 hover:text-slate-700'
-              }`}
+          {/* Error Message */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, duration: 0.3 }}
+              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
             >
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
-                </svg>
-                Workflow Templates
-                <span className="ml-1 px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-xs font-semibold">
-                  {WORKFLOW_TEMPLATES_ENTERPRISE.length}
-                </span>
-              </div>
-            </button>
-            <button
-              onClick={() => setActiveTab('actions')}
-              className={`px-6 py-4 text-sm font-semibold border-b-2 transition-colors ${
-                activeTab === 'actions'
-                  ? 'border-slate-900 text-slate-900'
-                  : 'border-transparent text-slate-500 hover:text-slate-700'
-              }`}
+              <p className="text-sm text-red-700">
+                {error === 'OAuthAccountNotLinked' || error === 'AccessDenied'
+                  ? '❌ Access Denied: Only @fourkites.com email addresses are allowed'
+                  : '❌ Authentication error. Please try again.'}
+              </p>
+            </motion.div>
+          )}
+
+          {/* Google Sign-In Button */}
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            whileHover={{ scale: 1.02, boxShadow: "0 10px 30px rgba(37, 99, 235, 0.3)" }}
+            whileTap={{ scale: 0.98 }}
+            onClick={handleGoogleSignIn}
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-3 shadow-md"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none">
+              <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+              <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+              <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+              <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Sign in with Google
+          </motion.button>
+
+          {/* Demo Button - Temporary for Demo */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="mt-4"
+          >
+            <motion.a
+              whileHover={{ scale: 1.02, boxShadow: "0 10px 30px rgba(75, 85, 99, 0.3)" }}
+              whileTap={{ scale: 0.98 }}
+              href="/workflows"
+              className="w-full bg-gray-600 hover:bg-gray-700 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 shadow-md"
             >
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
-                Action Library
-                <span className="ml-1 px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full text-xs font-semibold">
-                  {Object.keys(ACTION_BLOCKS).length}
-                </span>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
+              Continue to Workflow Builder (Demo)
+            </motion.a>
+          </motion.div>
 
-      {/* Templates View */}
-      {activeTab === 'templates' && (
-        <div className="max-w-[1600px] mx-auto px-8 py-12">
-          {/* Category Filter */}
-          <div className="flex items-center gap-3 mb-8">
-            <span className="text-sm font-medium text-slate-700">Filter by category:</span>
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
-                  selectedCategory === category
-                    ? 'bg-slate-900 text-white'
-                    : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-            <div className="ml-auto text-sm text-slate-500">
-              {filteredTemplates.length} template{filteredTemplates.length !== 1 ? 's' : ''}
-            </div>
-          </div>
-
-          {/* Templates Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {filteredTemplates.map((template) => (
-              <div
-                key={template.id}
-                className="group bg-white border border-slate-200 rounded-xl overflow-hidden hover:border-slate-300 hover:shadow-lg transition-all duration-200"
-              >
-                {/* Template Header */}
-                <div className={`h-24 bg-gradient-to-br ${template.gradient} relative`}>
-                  <div className="absolute inset-0 bg-black/5"></div>
-                  <div className="absolute top-3 right-3">
-                    <div className={`px-2.5 py-1 rounded-md text-xs font-semibold backdrop-blur-sm border ${
-                      template.complexity === 'simple' ? 'bg-green-500/20 text-white border-white/20' :
-                      template.complexity === 'moderate' ? 'bg-yellow-500/20 text-white border-white/20' :
-                      'bg-red-500/20 text-white border-white/20'
-                    }`}>
-                      {template.complexity}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Template Content */}
-                <div className="p-6">
-                  <h3 className="text-lg font-bold text-slate-900 mb-2 leading-tight">
-                    {template.name}
-                  </h3>
-
-                  <div className="flex items-center gap-3 text-xs text-slate-500 mb-3">
-                    <span className="inline-flex items-center gap-1">
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                      </svg>
-                      {template.category}
-                    </span>
-                    <span className="text-slate-300">•</span>
-                    <span className="inline-flex items-center gap-1">
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      {template.estimatedTime}
-                    </span>
-                  </div>
-
-                  <p className="text-sm text-slate-600 leading-relaxed mb-4 line-clamp-2">
-                    {template.description}
-                  </p>
-
-                  {/* Stats */}
-                  <div className="flex items-center gap-4 mb-5 pt-4 border-t border-slate-100">
-                    <div className="flex items-center gap-2 text-sm">
-                      <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center">
-                        <svg className="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                      </div>
-                      <span className="font-semibold text-slate-900">{template.nodes.length}</span>
-                      <span className="text-slate-500 text-xs">nodes</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <div className="w-7 h-7 rounded-lg bg-slate-100 flex items-center justify-center">
-                        <svg className="w-3.5 h-3.5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                      </div>
-                      <span className="font-semibold text-slate-900">{template.edges.length}</span>
-                      <span className="text-slate-500 text-xs">connections</span>
-                    </div>
-                  </div>
-
-                  {/* Use Button */}
-                  <Link
-                    href={`/builder?template=${template.id}`}
-                    className="block w-full px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-center font-semibold text-sm rounded-lg transition-all"
-                  >
-                    Use Template
-                  </Link>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Actions View */}
-      {activeTab === 'actions' && (
-        <div className="max-w-[1600px] mx-auto px-8 py-12">
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-2">Action Block Library</h2>
-            <p className="text-slate-600">
-              Drag these action blocks into the builder to create custom workflows.
-              Each block represents a specific operation in your automation.
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7, duration: 0.5 }}
+            className="mt-6 text-xs text-gray-500"
+          >
+            <p>You understand that FourKites will process your personal information as described in the{' '}
+              <a href="#" className="text-blue-600 hover:underline">FourKites Privacy Policy</a>{' '}
+              to provide the FourKites Platform.
             </p>
-          </div>
-
-          {/* Actions by Category */}
-          {Object.entries(actionsByCategory).map(([category, actions]) => (
-            <div key={category} className="mb-12">
-              <div className="flex items-center gap-3 mb-6">
-                <h3 className="text-lg font-bold text-slate-900">{category}</h3>
-                <span className="px-2.5 py-0.5 bg-slate-100 text-slate-600 rounded-full text-xs font-semibold">
-                  {actions.length} blocks
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {actions.map((action) => (
-                  <div
-                    key={action.id}
-                    className="bg-white border border-slate-200 rounded-xl p-5 hover:border-slate-300 hover:shadow-md transition-all group"
-                  >
-                    <div className="flex items-start gap-3 mb-3">
-                      <div className={`flex-shrink-0 w-11 h-11 rounded-lg bg-gradient-to-br ${action.gradient} flex items-center justify-center text-xl`}>
-                        {action.icon}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-slate-900 text-sm leading-tight mb-1">
-                          {action.name}
-                        </h4>
-                        <div className="text-xs text-slate-500">
-                          {action.action_count} action{action.action_count > 1 ? 's' : ''}
-                        </div>
-                      </div>
-                    </div>
-                    <p className="text-sm text-slate-600 leading-relaxed line-clamp-2 mb-3">
-                      {action.description}
-                    </p>
-                    <div className="flex items-center gap-2 text-xs text-slate-500 pt-3 border-t border-slate-100">
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                      </svg>
-                      <span>{action.required_params.length} required params</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
+          </motion.div>
         </div>
-      )}
+      </motion.div>
 
-      {/* Footer */}
-      <div className="border-t border-slate-200 bg-white mt-20">
-        <div className="max-w-[1600px] mx-auto px-8 py-8">
-          <div className="flex items-center justify-between text-sm text-slate-500">
-            <div className="flex items-center gap-4">
-              <span>© 2024 FourKites. All rights reserved.</span>
-              <span>•</span>
-              <span>Powered by Temporal</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <svg className="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span className="text-green-600 font-medium">Enterprise Ready</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Right Side - Branding */}
+      <motion.div
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6 }}
+        className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-blue-800 items-center justify-center p-12 relative overflow-hidden"
+      >
+        {/* Decorative Circles */}
+        <motion.div
+          animate={{
+            y: [0, -20, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-20 right-20 w-64 h-64 bg-blue-500 rounded-full opacity-20 blur-3xl"
+        />
+        <motion.div
+          animate={{
+            y: [0, 20, 0],
+            scale: [1, 1.15, 1],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute bottom-20 left-20 w-96 h-96 bg-blue-400 rounded-full opacity-20 blur-3xl"
+        />
 
-      {/* AI Workflow Builder - Full Screen 2-Panel Layout */}
-      {showAIBuilder && (
-        <div className="fixed inset-0 z-50 bg-white">
-          <FourKitesWorkflowBuilderV2
-            onClose={() => setShowAIBuilder(false)}
-            onWorkflowGenerated={(workflowJson) => {
-              console.log('Workflow generated:', workflowJson);
-            }}
-          />
+        <div className="relative z-10 text-white max-w-lg">
+          {/* FourKites Logo (White) */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="mb-12"
+          >
+            <img src="/fk_logo.png" alt="FourKites" className="h-14 brightness-0 invert" />
+          </motion.div>
+
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="text-4xl font-bold mb-6 leading-tight"
+          >
+            Empowering the world's leading brands with end-to-end supply chain agility since 2014
+          </motion.h2>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="grid grid-cols-3 gap-8 mt-12"
+          >
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="text-center"
+            >
+              <div className="text-4xl font-bold mb-2">3.2M</div>
+              <div className="text-sm text-blue-200">Shipments Tracked Every Single Day</div>
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="text-center"
+            >
+              <div className="text-4xl font-bold mb-2">1,200+</div>
+              <div className="text-sm text-blue-200">Customers Connected</div>
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="text-center"
+            >
+              <div className="text-4xl font-bold mb-2">550,000+</div>
+              <div className="text-sm text-blue-200">Carriers Onboarded</div>
+            </motion.div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="mt-16 flex gap-6 text-sm"
+          >
+            <a href="#" className="text-blue-200 hover:text-white transition-colors">Acceptable Use Policy</a>
+            <a href="#" className="text-blue-200 hover:text-white transition-colors">Copyright Policy</a>
+          </motion.div>
         </div>
-      )}
+      </motion.div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <LoginContent />
+    </Suspense>
   );
 }

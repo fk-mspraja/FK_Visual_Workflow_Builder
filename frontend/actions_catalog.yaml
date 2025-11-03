@@ -1,0 +1,235 @@
+# FourKites Workflow Actions Catalog
+# This file contains all available actions for the workflow builder
+
+email_actions:
+  send_initial_email:
+    name: "Send Initial Email"
+    category: "Email"
+    description: "Send professional outreach email for shipment information"
+    connector: "FourKites Email (Gmail)"
+    required_params:
+      - recipient_email:
+          type: "email"
+          description: "Primary recipient email address"
+      - facility:
+          type: "string"
+          description: "Facility name for the shipment"
+    optional_params:
+      - shipment_id:
+          type: "string"
+          description: "Optional shipment tracking ID"
+      - cc_list:
+          type: "string"
+          description: "Comma-separated CC email addresses"
+      - email_template:
+          type: "string"
+          description: "Email template to use"
+          options: ["shipment_info_request", "delivery_delay_notice", "bol_request"]
+      - custom_subject:
+          type: "string"
+          description: "Custom email subject line"
+      - custom_message:
+          type: "string"
+          description: "Custom email body message"
+
+  send_followup_email:
+    name: "Send Follow-up Email"
+    category: "Email"
+    description: "Send follow-up email when information is incomplete"
+    connector: "FourKites Email (Gmail)"
+    required_params:
+      - recipient_email:
+          type: "email"
+          description: "Email address to send follow-up"
+      - facility:
+          type: "string"
+          description: "Facility name"
+      - missing_fields:
+          type: "string"
+          description: "Comma-separated list of missing fields"
+    optional_params:
+      - cc_list:
+          type: "string"
+          description: "Comma-separated CC email addresses"
+
+  send_escalation_email:
+    name: "Send Escalation Email"
+    category: "Email"
+    description: "Send urgent escalation email to manager/supervisor"
+    connector: "FourKites Email (Gmail)"
+    required_params:
+      - escalation_recipient:
+          type: "email"
+          description: "Manager or supervisor email address"
+      - facility:
+          type: "string"
+          description: "Facility name"
+      - escalation_level:
+          type: "integer"
+          description: "Escalation level (1, 2, 3)"
+    optional_params:
+      - original_recipient:
+          type: "email"
+          description: "Original recipient who didn't respond"
+      - reason:
+          type: "string"
+          description: "Reason for escalation"
+      - cc_list:
+          type: "string"
+          description: "Comma-separated CC email addresses"
+
+  check_email_inbox:
+    name: "Check Email Inbox"
+    category: "Email"
+    description: "Check Gmail inbox for new emails and replies"
+    connector: "FourKites Email (Gmail)"
+    required_params: []
+    optional_params:
+      - subject_filter:
+          type: "string"
+          description: "Filter emails by subject line"
+      - from_filter:
+          type: "email"
+          description: "Filter emails by sender"
+      - since_hours:
+          type: "integer"
+          description: "Only check emails from last X hours"
+      - mark_as_read:
+          type: "boolean"
+          description: "Mark checked emails as read"
+
+  parse_email_response:
+    name: "Parse Email Response (AI)"
+    category: "Email"
+    description: "AI-powered email parsing to extract delivery info and detect gibberish"
+    connector: "FourKites AI (Claude)"
+    required_params: []
+    optional_params:
+      - email_body:
+          type: "string"
+          description: "Email body text to parse"
+      - subject_filter:
+          type: "string"
+          description: "Filter by subject before parsing"
+      - from_email:
+          type: "email"
+          description: "Filter by sender before parsing"
+      - auto_fetch:
+          type: "boolean"
+          description: "Automatically fetch latest email from inbox"
+      - since_hours:
+          type: "integer"
+          description: "Only parse emails from last X hours"
+
+document_actions:
+  extract_document_text:
+    name: "Extract Document Text"
+    category: "Documents"
+    description: "Extract text from PDF or Word documents (BOL, invoices, etc.)"
+    connector: "FourKites Document Processor"
+    required_params:
+      - document_path:
+          type: "string"
+          description: "Path to document file or email attachment"
+    optional_params:
+      - page_numbers:
+          type: "string"
+          description: "Specific pages to extract (e.g., '1-3,5')"
+
+  parse_document_with_ai:
+    name: "Parse Document with AI"
+    category: "Documents"
+    description: "AI-powered document parsing to extract structured information (BOL number, delivery date, etc.)"
+    connector: "FourKites AI (Claude)"
+    required_params:
+      - document_text:
+          type: "string"
+          description: "Extracted document text to parse"
+    optional_params:
+      - extraction_fields:
+          type: "array"
+          description: "Specific fields to extract"
+          options: ["bol_number", "delivery_date", "carrier_name", "tracking_number", "origin", "destination"]
+      - format:
+          type: "string"
+          description: "Output format"
+          options: ["json", "csv"]
+
+logic_actions:
+  wait_timer:
+    name: "Wait Timer"
+    category: "Logic"
+    description: "Wait for specified duration before continuing workflow"
+    connector: "FourKites Timer"
+    required_params:
+      - duration:
+          type: "integer"
+          description: "Duration to wait"
+    optional_params:
+      - unit:
+          type: "string"
+          description: "Time unit"
+          options: ["minutes", "hours", "days"]
+          default: "hours"
+
+  conditional_router:
+    name: "Conditional Router (If/Else)"
+    category: "Logic"
+    description: "Route workflow based on conditions (if/else logic)"
+    connector: "FourKites Logic"
+    required_params:
+      - condition_field:
+          type: "string"
+          description: "Field to check"
+      - operator:
+          type: "string"
+          description: "Comparison operator"
+          options: ["equals", "not_equals", "contains", "greater_than", "less_than"]
+      - condition_value:
+          type: "string"
+          description: "Value to compare against"
+    optional_params:
+      - true_branch:
+          type: "string"
+          description: "Next action if condition is true"
+      - false_branch:
+          type: "string"
+          description: "Next action if condition is false"
+
+trigger_actions:
+  check_database_trigger:
+    name: "Check Database Trigger"
+    category: "Triggers"
+    description: "Monitor database for new shipments requiring follow-up"
+    connector: "FourKites Database"
+    required_params:
+      - database:
+          type: "string"
+          description: "Database connection string"
+    optional_params:
+      - query_filter:
+          type: "string"
+          description: "SQL query filter for specific shipments"
+
+# Workflow Templates
+workflow_templates:
+  late_delivery_notifier:
+    name: "Late Delivery Notifier"
+    description: "Automatically notify facilities about late deliveries and track responses"
+    actions:
+      - send_initial_email
+      - wait_timer
+      - check_email_inbox
+      - parse_email_response
+      - conditional_router
+      - send_followup_email
+      - send_escalation_email
+
+  bol_document_extractor:
+    name: "BOL Document Extractor"
+    description: "Extract Bill of Lading information from email attachments"
+    actions:
+      - check_email_inbox
+      - extract_document_text
+      - parse_document_with_ai
+      - send_initial_email

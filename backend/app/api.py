@@ -14,26 +14,12 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-# Temporal imports - commented out for now (these are used in visual builder)
-# from temporalio.client import Client
-# from temporal.workflows.dynamic_workflow import VisualWorkflowExecutor
-# from temporal.activities.fourkites_actions import FOURKITES_ACTION_BLOCKS
+from temporalio.client import Client
+from dynamic_workflow import VisualWorkflowExecutor
+from src.activities.fourkites_actions import FOURKITES_ACTION_BLOCKS
+from src.activities.real_email_actions import REAL_EMAIL_ACTION_BLOCKS
 
-app = FastAPI(
-    title="FourKites Workflow Builder API",
-    description="AI-powered workflow automation with conversational builder and visual flow designer",
-    version="1.0.0"
-)
-
-# Include API routers
-from app.api import workflow_agent_router
-app.include_router(workflow_agent_router, prefix="/api")
-
-# Health check endpoint
-@app.get("/health")
-async def health_check():
-    """Health check endpoint for load balancers"""
-    return {"status": "healthy", "service": "fourkites-workflow-builder"}
+app = FastAPI(title="FourKites Workflow Builder API")
 
 # Enable CORS for frontend
 app.add_middleware(
@@ -69,11 +55,14 @@ async def root():
 @app.get("/api/actions")
 async def get_actions():
     """
-    Get all available FourKites action blocks with metadata
+    Get all available REAL action blocks with metadata (ONLY real Gmail/AI actions, no mocks)
     """
+    # ONLY use real email action blocks (removed all mock FourKites actions)
+    all_blocks = REAL_EMAIL_ACTION_BLOCKS
+
     # Group by category
     by_category = {}
-    for block_id, block_info in FOURKITES_ACTION_BLOCKS.items():
+    for block_id, block_info in all_blocks.items():
         category = block_info["category"]
         if category not in by_category:
             by_category[category] = []
@@ -86,11 +75,12 @@ async def get_actions():
             "color": block_info["color"],
             "action_count": block_info["action_count"],
             "category": category,
-            "config_fields": block_info.get("config_fields", [])
+            "config_fields": block_info.get("config_fields", []),
+            "branches": block_info.get("branches", [])  # For conditional_router
         })
 
     return {
-        "total": len(FOURKITES_ACTION_BLOCKS),
+        "total": len(all_blocks),
         "categories": by_category
     }
 
@@ -119,6 +109,15 @@ async def execute_workflow(workflow: WorkflowDefinition):
 
         # Convert workflow definition to proper format
         workflow_data = workflow.model_dump()
+
+        # Map action IDs to activity function names
+        all_blocks = {**FOURKITES_ACTION_BLOCKS, **REAL_EMAIL_ACTION_BLOCKS}
+        for node in workflow_data.get("nodes", []):
+            activity_id = node.get("activity")
+            if activity_id and activity_id in all_blocks:
+                # Use activity_function if defined, otherwise use activity_id as-is
+                activity_function = all_blocks[activity_id].get("activity_function", activity_id)
+                node["activity"] = activity_function
 
         # If workflow has no edges array but nodes have 'next' field, convert to edges
         if not workflow_data.get("edges") or len(workflow_data.get("edges", [])) == 0:
@@ -457,23 +456,29 @@ async def health_check():
     except:
         temporal_status = "disconnected"
 
+    all_blocks = {**FOURKITES_ACTION_BLOCKS, **REAL_EMAIL_ACTION_BLOCKS}
     return {
         "status": "healthy",
         "temporal": temporal_status,
-        "actions_loaded": len(FOURKITES_ACTION_BLOCKS),
+        "actions_loaded": len(all_blocks),
+        "mock_actions": len(FOURKITES_ACTION_BLOCKS),
+        "real_email_actions": len(REAL_EMAIL_ACTION_BLOCKS),
         "agent_available": AGENT_AVAILABLE
     }
 
 
 if __name__ == "__main__":
     import uvicorn
+    all_blocks = {**FOURKITES_ACTION_BLOCKS, **REAL_EMAIL_ACTION_BLOCKS}
     print("="*70)
     print("🚀 FourKites Workflow Builder API")
     print("="*70)
-    print(f"✅ Loaded {len(FOURKITES_ACTION_BLOCKS)} action blocks")
-    print(f"✅ API available at: http://localhost:8000")
-    print(f"✅ Documentation: http://localhost:8000/docs")
-    print(f"✅ Frontend: http://localhost:3000")
+    print(f"✅ Loaded {len(all_blocks)} total action blocks")
+    print(f"   - {len(FOURKITES_ACTION_BLOCKS)} mock actions")
+    print(f"   - {len(REAL_EMAIL_ACTION_BLOCKS)} real email actions")
+    print(f"✅ API available at: http://localhost:8001")
+    print(f"✅ Documentation: http://localhost:8001/docs")
+    print(f"✅ Frontend: http://localhost:3003")
     print("="*70 + "\n")
 
     uvicorn.run(app, host="0.0.0.0", port=8001)

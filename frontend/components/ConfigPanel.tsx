@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useWorkflowStore, WorkflowNode } from '@/lib/store';
 import { ACTION_BLOCKS } from '@/lib/actions';
-import { EMAIL_TEMPLATES, getTemplateByValue, renderTemplate } from '@/lib/emailTemplates';
+import { EMAIL_TEMPLATES, getTemplateById, fillTemplate } from '@/lib/emailTemplates';
 
 export default function ConfigPanel() {
   const { selectedNode, updateNodeParams, selectNode } = useWorkflowStore();
@@ -246,9 +246,9 @@ export default function ConfigPanel() {
 
     // Handle email template selector
     if (paramName === 'email_template') {
-      const selectedTemplate = getTemplateByValue(value || 'shipment_request');
+      const selectedTemplate = getTemplateById(value || 'late-delivery-initial');
       const rendered = selectedTemplate
-        ? renderTemplate(selectedTemplate, {
+        ? fillTemplate(selectedTemplate, {
             facility: formData.facility || '[Facility Name]',
             shipment_id: formData.shipment_id || '[Shipment ID]',
             recipient_email: formData.recipient_email || '[Recipient Email]',
@@ -262,14 +262,14 @@ export default function ConfigPanel() {
             {isRequired && <span className="text-red-500 ml-1">*</span>}
           </label>
           <select
-            value={value || 'shipment_request'}
+            value={value || 'late-delivery-initial'}
             onChange={(e) => handleInputChange(paramName, e.target.value)}
             className="w-full px-3 py-2 text-sm text-slate-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white mb-3"
             required={isRequired}
           >
             {EMAIL_TEMPLATES.map((template) => (
-              <option key={template.value} value={template.value}>
-                {template.label}
+              <option key={template.id} value={template.id}>
+                {template.icon} {template.name}
               </option>
             ))}
           </select>
@@ -299,10 +299,9 @@ export default function ConfigPanel() {
                   <div className="text-sm font-medium text-slate-900">{rendered.subject}</div>
                 </div>
                 {/* Email Body */}
-                <div
-                  className="bg-white p-4 text-xs"
-                  dangerouslySetInnerHTML={{ __html: rendered.body }}
-                />
+                <div className="bg-white p-4 text-xs whitespace-pre-wrap">
+                  {rendered.body}
+                </div>
               </div>
             </div>
           )}

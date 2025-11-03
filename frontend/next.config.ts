@@ -1,9 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  turbopack: {
-    root: "/Users/msp.raja/FK_Visual_Workflow_Builder/frontend",
-  },
+  /* config options here */
 };
 
 export default nextConfig;

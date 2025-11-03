@@ -3,6 +3,7 @@
 import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
+import { motion } from 'framer-motion';
 
 function LoginContent() {
   const searchParams = useSearchParams();
@@ -15,29 +16,63 @@ function LoginContent() {
   return (
     <div className="min-h-screen flex">
       {/* Left Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-white px-8">
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6 }}
+        className="w-full lg:w-1/2 flex items-center justify-center bg-white px-8"
+      >
         <div className="w-full max-w-md">
           {/* FourKites Logo */}
-          <div className="mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="mb-8"
+          >
             <img src="/fk_logo.png" alt="FourKites" className="h-12" />
-          </div>
+          </motion.div>
 
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome to FourKites Agentic Workflow Builder</h1>
-          <p className="text-gray-600 mb-8">Sign in to get started</p>
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="text-3xl font-bold text-gray-900 mb-2"
+          >
+            Welcome to FourKites Agentic Workflow Builder
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="text-gray-600 mb-8"
+          >
+            Sign in to get started
+          </motion.p>
 
           {/* Error Message */}
           {error && (
-            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, duration: 0.3 }}
+              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg"
+            >
               <p className="text-sm text-red-700">
                 {error === 'OAuthAccountNotLinked' || error === 'AccessDenied'
                   ? '❌ Access Denied: Only @fourkites.com email addresses are allowed'
                   : '❌ Authentication error. Please try again.'}
               </p>
-            </div>
+            </motion.div>
           )}
 
           {/* Google Sign-In Button */}
-          <button
+          <motion.button
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            whileHover={{ scale: 1.02, boxShadow: "0 10px 30px rgba(37, 99, 235, 0.3)" }}
+            whileTap={{ scale: 0.98 }}
             onClick={handleGoogleSignIn}
             className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-3 shadow-md"
           >
@@ -48,64 +83,132 @@ function LoginContent() {
               <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
             </svg>
             Sign in with Google
-          </button>
+          </motion.button>
 
           {/* Demo Button - Temporary for Demo */}
-          <div className="mt-4">
-            <a
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="mt-4"
+          >
+            <motion.a
+              whileHover={{ scale: 1.02, boxShadow: "0 10px 30px rgba(75, 85, 99, 0.3)" }}
+              whileTap={{ scale: 0.98 }}
               href="/"
               className="w-full bg-gray-600 hover:bg-gray-700 text-white py-3 px-4 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 shadow-md"
             >
               Continue to Workflow Builder (Demo)
-            </a>
-          </div>
+            </motion.a>
+          </motion.div>
 
-          <div className="mt-6 text-xs text-gray-500">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7, duration: 0.5 }}
+            className="mt-6 text-xs text-gray-500"
+          >
             <p>You understand that FourKites will process your personal information as described in the{' '}
               <a href="#" className="text-blue-600 hover:underline">FourKites Privacy Policy</a>{' '}
               to provide the FourKites Platform.
             </p>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Right Side - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-blue-800 items-center justify-center p-12 relative overflow-hidden">
+      <motion.div
+        initial={{ opacity: 0, x: 50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.6 }}
+        className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 to-blue-800 items-center justify-center p-12 relative overflow-hidden"
+      >
         {/* Decorative Circles */}
-        <div className="absolute top-20 right-20 w-64 h-64 bg-blue-500 rounded-full opacity-20 blur-3xl"></div>
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-blue-400 rounded-full opacity-20 blur-3xl"></div>
+        <motion.div
+          animate={{
+            y: [0, -20, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 8,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-20 right-20 w-64 h-64 bg-blue-500 rounded-full opacity-20 blur-3xl"
+        />
+        <motion.div
+          animate={{
+            y: [0, 20, 0],
+            scale: [1, 1.15, 1],
+          }}
+          transition={{
+            duration: 10,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute bottom-20 left-20 w-96 h-96 bg-blue-400 rounded-full opacity-20 blur-3xl"
+        />
 
         <div className="relative z-10 text-white max-w-lg">
           {/* FourKites Logo (White) */}
-          <div className="mb-12">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3, duration: 0.5 }}
+            className="mb-12"
+          >
             <img src="/fk_logo.png" alt="FourKites" className="h-14 brightness-0 invert" />
-          </div>
+          </motion.div>
 
-          <h2 className="text-4xl font-bold mb-6 leading-tight">
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.5 }}
+            className="text-4xl font-bold mb-6 leading-tight"
+          >
             Empowering the world's leading brands with end-to-end supply chain agility since 2014
-          </h2>
+          </motion.h2>
 
-          <div className="grid grid-cols-3 gap-8 mt-12">
-            <div className="text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+            className="grid grid-cols-3 gap-8 mt-12"
+          >
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="text-center"
+            >
               <div className="text-4xl font-bold mb-2">3.2M</div>
               <div className="text-sm text-blue-200">Shipments Tracked Every Single Day</div>
-            </div>
-            <div className="text-center">
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="text-center"
+            >
               <div className="text-4xl font-bold mb-2">1,200+</div>
               <div className="text-sm text-blue-200">Customers Connected</div>
-            </div>
-            <div className="text-center">
+            </motion.div>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              className="text-center"
+            >
               <div className="text-4xl font-bold mb-2">550,000+</div>
               <div className="text-sm text-blue-200">Carriers Onboarded</div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          <div className="mt-16 flex gap-6 text-sm">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+            className="mt-16 flex gap-6 text-sm"
+          >
             <a href="#" className="text-blue-200 hover:text-white transition-colors">Acceptable Use Policy</a>
             <a href="#" className="text-blue-200 hover:text-white transition-colors">Copyright Policy</a>
-          </div>
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
