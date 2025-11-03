@@ -83,9 +83,89 @@ temporal-project_backup_20251031_181240/
 ## 📦 Installation
 
 ### Prerequisites
-- Node.js 18+
-- Python 3.11+
-- Temporal CLI
+- **Option 1 (Docker - Recommended)**: Docker & Docker Compose
+- **Option 2 (Manual)**: Node.js 18+, Python 3.11+, Temporal CLI
+
+## 🐳 Docker Installation (Recommended)
+
+### Quick Start with Docker
+
+1. **Clone Repository**
+```bash
+git clone https://github.com/fk-mspraja/FK_Visual_Workflow_Builder.git
+cd FK_Visual_Workflow_Builder
+```
+
+2. **Create Environment Files**
+```bash
+# Frontend environment
+cp frontend/.env.local.example frontend/.env.local
+# Edit frontend/.env.local with your credentials
+
+# Backend environment
+cp backend/.env.example backend/.env
+# Edit backend/.env with your credentials
+```
+
+3. **Start All Services with Docker Compose**
+```bash
+docker-compose up -d
+```
+
+This single command will start:
+- ✅ Temporal Server (ports 7233, 8233)
+- ✅ Backend API (port 8001)
+- ✅ Backend Worker
+- ✅ Frontend (port 3003)
+
+4. **Verify Services**
+```bash
+docker-compose ps
+```
+
+5. **View Logs**
+```bash
+# All services
+docker-compose logs -f
+
+# Specific service
+docker-compose logs -f frontend
+docker-compose logs -f backend-api
+docker-compose logs -f backend-worker
+docker-compose logs -f temporal
+```
+
+6. **Stop Services**
+```bash
+docker-compose down
+```
+
+7. **Rebuild After Code Changes**
+```bash
+docker-compose down
+docker-compose build
+docker-compose up -d
+```
+
+### Docker Services Architecture
+
+```
+┌─────────────────────────────────────────────────┐
+│  Frontend (Next.js)         :3003               │
+│  ↓ Calls                                        │
+│  Backend API (FastAPI)      :8001               │
+│  ↓ Connects to                                  │
+│  Temporal Server (gRPC)     :7233               │
+│  ↑ Connected by                                 │
+│  Backend Worker (Python)                        │
+│                                                  │
+│  Temporal Web UI            :8233               │
+└─────────────────────────────────────────────────┘
+```
+
+---
+
+## 💻 Manual Installation (Alternative)
 
 ### 1. Clone Repository
 ```bash
@@ -205,14 +285,28 @@ curl http://localhost:3003
 
 - **Frontend**: http://localhost:3003
 - **Backend API**: http://localhost:8001
-- **Temporal UI**: http://localhost:8233
+- **Temporal Web UI**: http://localhost:8233
+- **Temporal Server**: localhost:7233 (gRPC - for backend connections)
 - **API Docs**: http://localhost:8001/docs
 
-### Service Status
-✅ **Temporal Server** - Running on port 8233
-✅ **Backend Worker** - Processing workflow activities
-✅ **Backend API** - Running on port 8001
-✅ **Frontend** - Running on port 3003
+### Service Status & Ports
+✅ **Temporal Server (gRPC API)** - Running on port **7233**
+   - Used by backend workers and API to connect to Temporal
+   - Configure via `TEMPORAL_HOST=localhost:7233` in backend .env
+
+✅ **Temporal Web UI** - Running on port **8233**
+   - Web interface for monitoring workflows
+   - Access at http://localhost:8233
+
+✅ **Backend API (FastAPI)** - Running on port **8001**
+   - REST API endpoints
+   - API docs at http://localhost:8001/docs
+
+✅ **Backend Worker** - Connects to Temporal on port **7233**
+   - Processes workflow activities
+
+✅ **Frontend (Next.js)** - Running on port **3003**
+   - Main web application
 
 ### Stop All Services
 
